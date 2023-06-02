@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { FiGithub } from 'react-icons/fi';
+import FilterForm from './FilterForm';
+import DatabaseTable from './DatabaseTable';
 
-function App() {
+const App = () => {
+  const [filteredData, setFilteredData] = useState([]);
+
+  const handleFilter = (filteredData) => {
+    setFilteredData(filteredData);
+  };
+
+  const handleGithubLink = () => {
+    window.location.href = 'https://github.com/edofransisco011/advance_filter_app';
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container mx-auto p-4">
+      <button
+        className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md mb-4"
+        onClick={handleGithubLink}
+      >
+        <FiGithub className="mr-2" />
+        Source Code
+      </button>
+      <FilterForm onFilter={handleFilter} />
+      <DatabaseTable data={filteredData} />
     </div>
   );
-}
+};
 
 export default App;
