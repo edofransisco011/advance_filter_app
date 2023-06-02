@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import data from './database';
 
 const FilterForm = ({ onFilter }) => {
-  const [minAge, setMinAge] = useState('');
-  const [maxAge, setMaxAge] = useState('');
+  const [ageComparison, setAgeComparison] = useState('lower');
+  const [age, setAge] = useState('');
   const [nameFilter, setNameFilter] = useState('');
-  const [excludedCities, setExcludedCities] = useState([]);
+  const [cityFilter, setCityFilter] = useState('');
+  const [cityComparison, setCityComparison] = useState('include');
   const [showRefreshPopup, setShowRefreshPopup] = useState(false);
 
   const handleFilter = (e) => {
@@ -13,10 +14,10 @@ const FilterForm = ({ onFilter }) => {
     setShowRefreshPopup(false);
 
     const filteredData = data.filter((person) => {
-      if (minAge && person.age < minAge) {
+      if (ageComparison === 'lower' && person.age >= age) {
         return false;
       }
-      if (maxAge && person.age > maxAge) {
+      if (ageComparison === 'higher' && person.age <= age) {
         return false;
       }
 
@@ -33,12 +34,14 @@ const FilterForm = ({ onFilter }) => {
         }
       }
 
-      if (excludedCities.length > 0) {
+      if (cityFilter) {
         const personCity = person.city.toLowerCase();
-        for (const city of excludedCities) {
-          if (city.toLowerCase().includes(personCity) || personCity.includes(city.toLowerCase())) {
-            return false;
-          }
+        const filterCity = cityFilter.toLowerCase();
+        if (
+          (cityComparison === 'include' && !personCity.includes(filterCity)) ||
+          (cityComparison === 'exclude' && personCity.includes(filterCity))
+        ) {
+          return false;
         }
       }
 
@@ -57,34 +60,62 @@ const FilterForm = ({ onFilter }) => {
       <h2 className="text-lg font-semibold mb-4">Filter Data</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="mb-4">
-          <label htmlFor="minAge" className="text-sm font-medium text-gray-700 mb-2">
-            Min Age:
+          <label htmlFor="ageComparison" className="text-sm font-medium text-gray-700 mb-2">
+            Age Comparison:
           </label>
-          <input
-            id="minAge"
-            type="number"
-            value={minAge}
-            onChange={(e) => {
-              setMinAge(e.target.value);
-              handleInputChange();
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <div className="flex">
+            <select
+              id="ageComparison"
+              value={ageComparison}
+              onChange={(e) => {
+                setAgeComparison(e.target.value);
+                handleInputChange();
+              }}
+              className="w-1/3 rounded-l-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="lower">Lower</option>
+              <option value="higher">Higher</option>
+            </select>
+            <input
+              id="age"
+              type="number"
+              value={age}
+              onChange={(e) => {
+                setAge(e.target.value);
+                handleInputChange();
+              }}
+              className="w-2/3 rounded-r-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
         </div>
         <div className="mb-4">
-          <label htmlFor="maxAge" className="text-sm font-medium text-gray-700 mb-2">
-            Max Age:
+          <label htmlFor="cityComparison" className="text-sm font-medium text-gray-700 mb-2">
+            City Comparison:
           </label>
-          <input
-            id="maxAge"
-            type="number"
-            value={maxAge}
-            onChange={(e) => {
-              setMaxAge(e.target.value);
-              handleInputChange();
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <div className="flex">
+            <select
+              id="cityComparison"
+              value={cityComparison}
+              onChange={(e) => {
+                setCityComparison(e.target.value);
+                handleInputChange();
+              }}
+              className="w-1/3 rounded-l-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="include">Include</option>
+              <option value="exclude">Exclude</option>
+            </select>
+            <input
+              id="cityFilter"
+              type="text"
+              value={cityFilter}
+              onChange={(e) => {
+                setCityFilter(e.target.value);
+                handleInputChange();
+              }}
+              className="w-2/3 rounded-r-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
         </div>
         <div className="mb-4">
           <label htmlFor="nameFilter" className="text-sm font-medium text-gray-700 mb-2">
@@ -96,21 +127,6 @@ const FilterForm = ({ onFilter }) => {
             value={nameFilter}
             onChange={(e) => {
               setNameFilter(e.target.value);
-              handleInputChange();
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="excludedCities" className="text-sm font-medium text-gray-700 mb-2">
-            Excluded Cities:
-          </label>
-          <input
-            id="excludedCities"
-            type="text"
-            value={excludedCities.join(', ')}
-            onChange={(e) => {
-              setExcludedCities(e.target.value.split(',').map((city) => city.trim()));
               handleInputChange();
             }}
             className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
